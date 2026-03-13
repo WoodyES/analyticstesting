@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Analytics / Extension Test Lab</title>
+
+<!-- GA4 placeholder -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXX"></script>
+
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config','G-XXXX');
+</script>
+
+<style>
+
+body{
+font-family:Arial;
+padding:40px;
+background:#f6f6f6;
+}
+
+section{
+background:white;
+padding:20px;
+margin-bottom:30px;
+border-radius:8px;
+}
+
+button{
+padding:10px 14px;
+margin:6px;
+cursor:pointer;
+}
+
+.tooltip{
+position:relative;
+display:inline-block;
+}
+
+.tooltiptext{
+visibility:hidden;
+background:black;
+color:white;
+padding:4px 8px;
+border-radius:4px;
+position:absolute;
+top:-30px;
+}
+
+.tooltip:hover .tooltiptext{
+visibility:visible;
+}
+
+.focus-input{
+border:2px solid #ccc;
+padding:6px;
+}
+
+.focus-input:focus{
+border-color:blue;
+background:#eef4ff;
+}
+
+.dynamic-box{
+margin-top:10px;
+padding:10px;
+background:#e3f7ff;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Extension / Analytics Test Lab</h1>
+
+
+<section>
+
+<h2>Button Click Events</h2>
+
+<button id="btn1">Primary Button</button>
+<button id="btn2">Secondary Button</button>
+
+</section>
+
+
+<section>
+
+<h2>Form Submission</h2>
+
+<form id="testForm">
+
+<input placeholder="Name" required>
+<br><br>
+
+<input placeholder="Email" required>
+<br><br>
+
+<button type="submit">Submit</button>
+
+</form>
+
+<p id="formStatus"></p>
+
+</section>
+
+
+<section>
+
+<h2>Hover Tooltip</h2>
+
+<div class="tooltip">
+
+<button>Hover me</button>
+
+<span class="tooltiptext">Tooltip appears</span>
+
+</div>
+
+</section>
+
+
+<section>
+
+<h2>Focus Element</h2>
+
+<input class="focus-input" placeholder="Click me">
+
+</section>
+
+
+<section>
+
+<h2>dataLayer Tests</h2>
+
+<button onclick="pushSimple()">Push Simple Event</button>
+
+<button onclick="pushNested()">Push Nested Event</button>
+
+<pre id="dlOutput"></pre>
+
+</section>
+
+
+<section>
+
+<h2>Dynamic DOM Injection</h2>
+
+<button onclick="injectElement()">Add Dynamic Element</button>
+
+<div id="dynamicArea"></div>
+
+</section>
+
+
+<section>
+
+<h2>Delayed Event</h2>
+
+<button onclick="delayedEvent()">Trigger After 3 Seconds</button>
+
+</section>
+
+
+<section>
+
+<h2>Rapid Event Spam</h2>
+
+<button onclick="spamEvents()">Spam 10 Events</button>
+
+</section>
+
+
+<section>
+
+<h2>Attribute Mutation</h2>
+
+<button id="attrBtn" onclick="changeAttr()">Change Attribute</button>
+
+</section>
+
+
+<section>
+
+<h2>Iframe Test</h2>
+
+<iframe srcdoc="<button onclick='parent.postMessage(`iframeClick`,`*`)'>Iframe Button</button>" width="200" height="100"></iframe>
+
+</section>
+
+
+<section>
+
+<h2>Shadow DOM</h2>
+
+<div id="shadowHost"></div>
+
+</section>
+
+
+<script>
+
+
+document.getElementById("btn1").addEventListener("click", function(){
+
+dataLayer.push({
+event:"button_click",
+button_name:"primary"
+});
+
+});
+
+
+document.getElementById("btn2").addEventListener("click", function(){
+
+dataLayer.push({
+event:"button_click",
+button_name:"secondary"
+});
+
+});
+
+
+document.getElementById("testForm").addEventListener("submit",function(e){
+
+e.preventDefault();
+
+dataLayer.push({
+event:"form_submit",
+form:"testForm"
+});
+
+document.getElementById("formStatus").innerText="Form submitted";
+
+});
+
+
+function pushSimple(){
+
+let ev={
+event:"simple_event",
+value:Math.floor(Math.random()*100)
+};
+
+dataLayer.push(ev);
+
+document.getElementById("dlOutput").innerText=JSON.stringify(ev,null,2);
+
+}
+
+
+function pushNested(){
+
+let ev={
+event:"nested_event",
+user:{
+id:123,
+plan:"pro"
+},
+product:{
+name:"Test Product",
+price:19.99
+}
+};
+
+dataLayer.push(ev);
+
+document.getElementById("dlOutput").innerText=JSON.stringify(ev,null,2);
+
+}
+
+
+function injectElement(){
+
+let el=document.createElement("button");
+
+el.innerText="Dynamic Button";
+
+el.className="dynamic-box";
+
+el.onclick=function(){
+
+dataLayer.push({
+event:"dynamic_click"
+});
+
+};
+
+document.getElementById("dynamicArea").appendChild(el);
+
+}
+
+
+function delayedEvent(){
+
+setTimeout(function(){
+
+dataLayer.push({
+event:"delayed_event"
+});
+
+alert("Delayed event fired");
+
+},3000);
+
+}
+
+
+function spamEvents(){
+
+for(let i=0;i<10;i++){
+
+dataLayer.push({
+event:"spam_event",
+count:i
+});
+
+}
+
+console.log("10 events pushed");
+
+}
+
+
+function changeAttr(){
+
+let btn=document.getElementById("attrBtn");
+
+btn.setAttribute("data-state","changed");
+
+}
+
+
+window.addEventListener("message",function(e){
+
+if(e.data==="iframeClick"){
+
+dataLayer.push({
+event:"iframe_click"
+});
+
+}
+
+});
+
+
+/* Shadow DOM */
+
+let host=document.getElementById("shadowHost");
+
+let shadow=host.attachShadow({mode:"open"});
+
+let btn=document.createElement("button");
+
+btn.innerText="Shadow DOM Button";
+
+btn.onclick=function(){
+
+dataLayer.push({
+event:"shadow_click"
+});
+
+};
+
+shadow.appendChild(btn);
+
+</script>
+
+
+</body>
+</html>
