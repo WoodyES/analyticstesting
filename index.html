@@ -400,7 +400,17 @@ event:"shadow_click"
 shadow.appendChild(btn);
 
 </script>
-
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var el = document.querySelector("#btn1");
+  if (el) {
+    el.addEventListener("click", function() {
+      window.clarity("event", "Primary Button click");
+      gtag("event", "Primary Button click", { event_category: "engagement" });
+    });
+  }
+});
+</script>
 
 </body>
 </html>
