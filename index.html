@@ -411,6 +411,15 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 </script>
-
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var el = document.querySelector("#btn1");
+  if (el) {
+    el.addEventListener("click", function() {
+      window.clarity("event", "Primary button click - MS Clarity - hardcoded");
+    });
+  }
+});
+</script>
 </body>
 </html>
